@@ -2,12 +2,13 @@
 /**
  * Purpose: Fetch events from the /json/mcalendar.php endpoint.
  * Parameters:
- * year (optional, futur for future events, past1 for past year, or a specific year)
- * country (optional)
- * dist (distance, optional)
+ * year (required, futur for future events, past1 for past year, or a specific year)
+ * country (required, default: all)
+ * dist (required. distance, default: all)
  * cup (optional)
- * rproof (ranking eligible. 0 for all, 1 for yes, 2 for no. optional)
- * norslt (no results, 1 to include events without results. optional)
+ * rproof (required. ranking eligible. 0 for all, 1 for yes, 2 for no. )
+ * mode (optional, list for list, map for map)
+ * norslt (optional. no results, 1 to include events without results. )
  * page (optional, for handling pagination)
  */
 
@@ -44,8 +45,6 @@ export async function fetchCalendarData(params = {}) {
 
     // Attempt to parse the JSON response
     try {
-      console.log(response);
-
       return {
         events: response.data.Races,
         pagination: response.data.Pagination,
@@ -53,7 +52,7 @@ export async function fetchCalendarData(params = {}) {
           yearList: response.data.FltYearlist,
           countryList: response.data.FltCountryValues.map((code, index) => ({
             code,
-            label: response.data.FltCountryValues[index],
+            label: response.data.FltCountryLabels[index],
           })),
           distanceList: response.data.FltDistValue.map((value, index) => ({
             value,

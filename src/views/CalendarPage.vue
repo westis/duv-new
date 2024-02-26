@@ -9,6 +9,7 @@
       :country-list="filters.countryList"
       @filter-updated="fetchEvents"
     />
+
     <CalendarEvents
       :events="events"
       :isLoading="isLoading"
@@ -34,22 +35,29 @@ export default {
     const fetchEvents = async (filterOptions) => {
       isLoading.value = true;
       try {
-        // Construct the query string
-        const queryString = Object.entries(filterOptions)
-          .map(([key, value]) => {
-            return value
-              ? `${encodeURIComponent(key)}=${encodeURIComponent(value)}`
-              : null;
-          })
-          .filter(Boolean)
-          .join("&");
+        // Default parameters (adjust as needed)
+        const defaultParams = {
+          year: "futur",
+          dist: "all",
+          country: "all",
+          cups: "all",
+          rproof: 0,
+          mode: "list",
+        };
 
-        const response = await fetchCalendarData(queryString);
+        // Merging defaults and user-selected filters
+        const params = { ...defaultParams, ...filterOptions };
+
+        // Pass the params object directly, not as a query string
+        const response = await fetchCalendarData(params);
+        console.log("Fetched Data:", response);
         events.value = response.events;
         filters.value = response.filters;
+        console.log("Updated filters in CalendarPage:", filters.value);
+
         console.log("CalendarPage filters: ", filters);
       } catch (error) {
-        errorMessage.value = error.message; // Set the error message
+        errorMessage.value = error.message;
       } finally {
         isLoading.value = false;
       }
