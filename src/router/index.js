@@ -1,11 +1,17 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
+import CalendarPage from "../views/CalendarPage.vue";
 
 const routes = [
   {
     path: "/",
     name: "home",
     component: HomeView,
+  },
+  {
+    path: "/calendar", // The route for your calendar page
+    name: "calendar",
+    component: CalendarPage,
   },
   {
     path: "/about",
