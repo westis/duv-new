@@ -1,7 +1,10 @@
+// file path: src/main.js
+
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
+import NavigationBar from "./components/NavigationBar.vue"; // Import NavigationBar
 import "./assets/main.css";
 
 // Vuetify
@@ -15,13 +18,12 @@ const vuetify = createVuetify({
   components,
   directives,
   theme: {
-    // Add theme configuration
     defaultTheme: "dark", // Set the default starting theme
     themes: {
       light: {
         // Your light theme colors
         colors: {
-          primary: "#1867C0",
+          primary: "#FEA541",
           secondary: "#5CBBF6",
           // ... other light theme colors
         },
@@ -38,4 +40,9 @@ const vuetify = createVuetify({
   },
 });
 
-createApp(App).use(store).use(router).use(vuetify).mount("#app");
+const app = createApp(App);
+app.use(store);
+app.use(router);
+app.use(vuetify);
+app.component("NavigationBar", NavigationBar); // Register NavigationBar globally
+app.mount("#app");

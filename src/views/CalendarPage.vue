@@ -1,12 +1,13 @@
 <template>
   <div class="calendar-page">
-    <v-alert>
+    <v-alert v-if="errorMessage" type="error">
       {{ errorMessage }}
     </v-alert>
     <h1>Event Calendar</h1>
     <CalendarFilters
       :year-list="filters.yearList"
       :country-list="filters.countryList"
+      :type-list="filters.eventTypeList"
       @filter-updated="fetchEvents"
     />
 

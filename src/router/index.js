@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import CalendarPage from "../views/CalendarPage.vue";
+import ResultsPage from "../views/ResultsPage.vue";
+import EventResultsPage from "@/views/EventResultsPage.vue";
 
 const routes = [
   {
@@ -12,6 +14,17 @@ const routes = [
     path: "/calendar", // The route for your calendar page
     name: "calendar",
     component: CalendarPage,
+  },
+  {
+    path: "/results",
+    name: "results",
+    component: ResultsPage, // Make sure to import and define ResultsView
+  },
+  {
+    path: "/results/:id",
+    name: "EventResults",
+    component: EventResultsPage,
+    props: true,
   },
   {
     path: "/about",

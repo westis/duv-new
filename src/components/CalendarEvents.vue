@@ -5,37 +5,42 @@
       <v-row>
         <v-col v-for="event in paginatedEvents" :key="event.EventID" cols="12">
           <v-card class="elevation-1">
-            <v-card-title class="race-name py-1 bg-grey-darken-3">{{
-              event.EventName
-            }}</v-card-title>
+            <v-card-title class="race-name py-1 bg-grey-darken-3">
+              {{ event.EventName }}
+            </v-card-title>
 
             <v-row>
-              <v-col cols="12" md="2" class="py-5 px-6">
-                <div class="date-container">
-                  <div class="date-day font-weight-bold">
+              <v-col cols="3" sm="2" xl="1" class="py-5 px-6">
+                <v-sheet
+                  class="pa-1 d-flex flex-column align-center rounded-lg date-container"
+                >
+                  <v-sheet class="date-day font-weight-bold">
                     {{ formatDate(event.Startdate, "DD") }}
-                  </div>
-                  <div class="date-month">
+                  </v-sheet>
+                  <v-sheet class="date-month">
                     {{ formatDate(event.Startdate, "MMM") }}
-                  </div>
-                  <div class="date-year text-medium-emphasis">
+                  </v-sheet>
+                  <v-sheet class="date-year text-medium-emphasis">
                     {{ formatDate(event.Startdate, "YYYY") }}
-                  </div>
-                </div>
+                  </v-sheet>
+                </v-sheet>
               </v-col>
 
-              <v-col cols="12" md="7" class="py-6 px-2">
-                <div class="city-container">
-                  <v-card-subtitle class="mb-4 pa-0">
-                    <v-icon class="ml-2" small>mdi-map-marker</v-icon>
-                    {{ event.City }}, {{ event.Country }}
-                  </v-card-subtitle>
-                </div>
+              <v-col
+                cols="5"
+                sm="5"
+                md="6"
+                class="py-4 px-0 d-flex flex-column align-left justify-center"
+              >
+                <v-sheet class="my-1">
+                  <v-icon class="ml-2" small>mdi-map-marker</v-icon>
+                  {{ event.City }}, {{ event.Country }}
+                </v-sheet>
 
-                <div class="chip-container mb-4">
+                <v-sheet class="chip-container my-2">
                   <v-chip
                     label
-                    class="mx-2"
+                    class="mx-2 my-1"
                     size="small"
                     v-if="event.Length"
                     :color="getTypeColor(15)"
@@ -45,7 +50,7 @@
 
                   <v-chip
                     label
-                    class="mx-2"
+                    class="mx-2 my-1"
                     size="small"
                     v-if="event.Duration && event.EventType !== 10"
                     :color="getTypeColor(16)"
@@ -55,7 +60,7 @@
 
                   <v-chip
                     label
-                    class="mx-2"
+                    class="mx-2 my-1"
                     size="small"
                     :color="getTypeColor(event.EventType)"
                   >
@@ -63,31 +68,33 @@
 
                     {{ filteredEventTypes(event.EventType) }}
                   </v-chip>
-                </div>
+                </v-sheet>
               </v-col>
 
-              <v-col cols="12" md="3" class="py-4">
-                <div class="actions-container">
-                  <v-btn
-                    class="ma-2 bg-primary"
-                    size="small"
-                    text
-                    :to="`/event/${event.EventID}`"
-                  >
-                    <v-icon start>mdi-information-outline</v-icon>
-                    Event Details
-                  </v-btn>
-                  <v-spacer></v-spacer>
-                  <v-btn
-                    class="ma-2 bg-primary"
-                    size="small"
-                    text
-                    :to="`/results/${event.EventID}`"
-                  >
-                    <v-icon start>mdi-trophy-outline</v-icon>
-                    Results
-                  </v-btn>
-                </div>
+              <v-col
+                cols="4"
+                sm="4"
+                class="py-4 px-4 d-flex flex-column align-center justify-center"
+              >
+                <v-btn
+                  class="ma-2 bg-primary"
+                  size="small"
+                  text
+                  :to="`/event/${event.EventID}`"
+                >
+                  <v-icon start>mdi-information-outline</v-icon>
+                  Event Details
+                </v-btn>
+
+                <v-btn
+                  class="ma-2 bg-primary"
+                  size="small"
+                  text
+                  :to="`/results/${event.EventID}`"
+                >
+                  <v-icon start>mdi-trophy-outline</v-icon>
+                  Results
+                </v-btn>
               </v-col>
             </v-row>
           </v-card>
@@ -103,127 +110,130 @@
   ></v-pagination>
 </template>
 
-<script>
-export default {
-  props: {
-    events: { type: Array, required: true },
-    isLoading: { type: Boolean, required: true },
-    eventTypeList: {
-      type: Array,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      headers: [
-        { text: "Event Name", value: "EventName" },
-        { text: "Details", value: "details" },
-        { text: "Actions", value: "actions", sortable: false },
-      ],
-      typeNameMap: {
-        "road race": "Road",
-        "trail race": "Trail",
-        "road race on a loop < 5km/3mi": "Road Loop",
-        "stage race": "Stage",
-        track: "Track",
-        indoor: "Indoor",
-        "friendship run, no competition": "Friendship",
-        "invitational race": "Invitational",
-        "elimination race": "Elimination",
-        "Backyard Ultra": "Backyard Ultra",
-        "walking road": "Walk (Road)",
-        "walking road on a loop < 5km/3mi": "Walk Loop",
-        "walking track": "Walk (Track)",
-        "walking indoor": "Walk (Indoor)",
-      },
-      colorMap: {
-        1: "blue", // Road event
-        2: "green", // Trail event
-        3: "lightblue", // Road race on a loop
-        4: "teal", // Stage race
-        5: "orange", // Track
-        6: "gray", // Indoor
-        7: "purple", // Friendship run
-        8: "purple", // Invitational race
-        9: "red", // Elimination race
-        10: "purple", // Backyard Ultra
-        11: "yellow", // Walking road
-        12: "yellow", // Walking road (loop)
-        13: "yellow", // Walking track
-        14: "yellow", // Walking indoor
-        15: "orange", // Duration
-        16: "yellow", // Length
-      },
-      iconMap: {
-        1: "mdi-highway", // Road Races
-        2: "mdi-tree", // Trail Races
-        3: "mdi-reload", // Road Race on a Loop
-        4: "mdi-flag-checkered", // Stage Race
-        5: "mdi-run", // Track Events
-        6: "mdi-home-variant", // Indoor Events
-        7: "mdi-account-group", // Friendship Run
-        8: "mdi-medal", // Invitational Race
-        9: "mdi-minus-circle", // Elimination Race
-        10: "mdi-timer-sand", // Backyard Ultra
-        11: "mdi-walk", // Walking Road
-        12: "mdi-foot-print", // Walking Road (Loop)
-        13: "mdi-map-marker-path", // Walking Track
-        14: "mdi-warehouse", // Walking Indoor
-      },
-      currentPage: 1,
-      itemsPerPage: 10, // Adjust as needed
-      totalItems: this.events.length, // Your custom icon name
-    };
-  },
-  computed: {
-    // Compute the total number of pages
-    totalPages() {
-      return Math.ceil(this.totalItems / this.itemsPerPage);
-    },
-    // Compute the events to display on the current page
-    paginatedEvents() {
-      const start = (this.currentPage - 1) * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-      return this.events.slice(start, end);
-    },
-  },
-  methods: {
-    formatDate(dateString, format) {
-      const date = new Date(dateString);
+<script setup>
+import { ref, computed, defineProps, inject } from "vue";
+import { watchEffect } from "vue";
 
-      // Use specific format specifiers based on the format string:
-      const day = date.toLocaleDateString("en-US", { day: "2-digit" });
-      const month = date.toLocaleDateString("en-US", {
-        month: format === "MMM" ? "short" : "long",
-      });
-      const year = date.toLocaleDateString("en-US", { year: "numeric" });
+// Props
+const props = defineProps({
+  events: { type: Array, required: true },
+  isLoading: { type: Boolean, required: true },
+  eventTypeList: { type: Array, required: true },
+});
 
-      // Return the formatted parts based on the format:
-      switch (format) {
-        case "DD":
-          return day;
-        case "MMM":
-          return month;
-        case "YYYY":
-          return year;
-        default:
-          return dateString; // Return full date for unknown formats
-      }
-    },
-    getTypeColor(eventType) {
-      return this.colorMap[eventType] || "default-color";
-    },
-    getEventIcon(eventType) {
-      return this.iconMap[eventType] || "mdi-help-circle";
-    },
+// Access the provided theme state
+const theme = inject("theme"); // Ensure 'theme' is provided at the root or a parent component
 
-    filteredEventTypes(eventType) {
-      const typeIndex = +eventType - 1;
-      const fullTypeName =
-        this.eventTypeList[typeIndex] || "Unknown Event Type";
+watchEffect(() => {
+  console.log("Theme changed to:", theme.value);
+});
 
-      return this.typeNameMap[fullTypeName] || fullTypeName;
-    },
-  },
+// Reactive states
+const currentPage = ref(1);
+const itemsPerPage = ref(10);
+const totalItems = computed(() => props.events.length);
+
+// Type name map
+const typeNameMap = {
+  "road race": "Road",
+  "trail race": "Trail",
+  "road race on a loop < 5km/3mi": "Road Loop",
+  "stage race": "Stage",
+  track: "Track",
+  indoor: "Indoor",
+  "friendship run, no competition": "Friendship",
+  "invitational race": "Invitational",
+  "elimination race": "Elimination",
+  "Backyard Ultra": "Backyard Ultra",
+  "walking road": "Walk (Road)",
+  "walking road on a loop < 5km/3mi": "Walk Loop",
+  "walking track": "Walk (Track)",
+  "walking indoor": "Walk (Indoor)",
 };
+
+// Color map adapted for light and dark mode
+const dynamicColorMap = computed(() => ({
+  1: theme.value === "dark" ? "grey-lighten-2" : "grey-darken-4", // Road event
+  2: theme.value === "dark" ? "green-lighten-2" : "green-darken-4", // Trail event
+  3: theme.value === "dark" ? "blue-grey-lighten-2" : "blue-grey-darken-4", // Road race on a loop
+  4: theme.value === "dark" ? "pink-lighten-2" : "pink-darken-4", // Stage race
+  5: theme.value === "dark" ? "deep-orange-lighten-2" : "deep-orange-darken-4", // Track
+  6: theme.value === "dark" ? "indigo-lighten-2" : "indigo-darken-4", // Indoor
+  7: theme.value === "dark" ? "deep-purple lighten-2" : "purple-darken-4", // Friendship run
+  8: theme.value === "dark" ? "indigo-lighten-2" : "deep-purple-darken-4", // Invitational race
+  9: theme.value === "dark" ? "red-lighten-2" : "red-darken-4", // Elimination race
+  10: theme.value === "dark" ? "brown-lighten-2" : "brown-darken-3", // Backyard Ultra
+  11: theme.value === "dark" ? "lime-lighten-2" : "yellow-darken-4", // Walking road
+  12: theme.value === "dark" ? "lime-lighten-2" : "yellow-darken-4", // Walking road (loop)
+  13: theme.value === "dark" ? "lime-lighten-2" : "yellow-darken-4", // Walking track
+  14: theme.value === "dark" ? "lime-lighten-2" : "yellow-darken-4", // Walking indoor
+  15: theme.value === "dark" ? "teal-lighten-2" : "teal-darken-4", // Duration
+  16: theme.value === "dark" ? "light-blue-lighten-2" : "light-blue-darken-4", // Length
+}));
+
+// Icon map remains the same
+const iconMap = {
+  1: "mdi-highway", // Road Races
+  2: "mdi-tree", // Trail Races
+  3: "mdi-reload", // Road Race on a Loop
+  4: "mdi-flag-checkered", // Stage Race
+  5: "mdi-run", // Track Events
+  6: "mdi-home-variant", // Indoor Events
+  7: "mdi-account-group", // Friendship Run
+  8: "mdi-medal", // Invitational Race
+  9: "mdi-minus-circle", // Elimination Race
+  10: "mdi-timer-sand", // Backyard Ultra
+  11: "mdi-walk", // Walking Road
+  12: "mdi-foot-print", // Walking Road (Loop)
+  13: "mdi-map-marker-path", // Walking Track
+  14: "mdi-warehouse", // Walking Indoor
+};
+
+// Computed properties for pagination and event type mapping
+const totalPages = computed(() =>
+  Math.ceil(totalItems.value / itemsPerPage.value)
+);
+const paginatedEvents = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value;
+  const end = start + itemsPerPage.value;
+  return props.events.slice(start, end);
+});
+
+// Methods
+function formatDate(dateString, format) {
+  const date = new Date(dateString);
+
+  // Use specific format specifiers based on the format string:
+  const day = date.toLocaleDateString("en-US", { day: "2-digit" });
+  const month = date.toLocaleDateString("en-US", {
+    month: format === "MMM" ? "short" : "long",
+  });
+  const year = date.toLocaleDateString("en-US", { year: "numeric" });
+
+  // Return the formatted parts based on the format:
+  switch (format) {
+    case "DD":
+      return day;
+    case "MMM":
+      return month;
+    case "YYYY":
+      return year;
+    default:
+      return dateString; // Return full date for unknown formats
+  }
+}
+
+function getTypeColor(eventType) {
+  return dynamicColorMap.value[eventType] || "default-color";
+}
+
+function getEventIcon(eventType) {
+  return iconMap[eventType] || "mdi-help-circle";
+}
+
+function filteredEventTypes(eventType) {
+  const typeIndex = +eventType - 1;
+  const fullTypeName = props.eventTypeList[typeIndex] || "Unknown Event Type";
+  return typeNameMap[fullTypeName] || fullTypeName;
+}
 </script>
