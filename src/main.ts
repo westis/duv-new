@@ -41,7 +41,7 @@ const vuetify = createVuetify({
 });
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   // the routes property is handled by the plugin
 });
 
