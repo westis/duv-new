@@ -52,4 +52,6 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v2
       - name: Log Page URL
-        run: echo "Page URL: ${{ steps.deployment.outputs.page_url }}"
+        run: | # Multi-line command starts here
+          echo "Page URL: ${{ steps.deployment.outputs.page_url }}" 
+
