@@ -4,7 +4,7 @@
     <v-alert v-if="errorMessage" type="error">
       {{ errorMessage }}
     </v-alert>
-    <h1>Event Calendar</h1>
+    <h1>{{ eventCalendarTitle }}</h1>
     <!-- Update: Use handleFilterUpdate to handle filter updates -->
     <CalendarFilters
       :year-list="currentFilters.yearList"
@@ -23,13 +23,14 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, onMounted } from "vue";
+import { ref, reactive, watch, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import CalendarFilters from "@/components/CalendarFilters.vue";
 import CalendarEvents from "@/components/CalendarEvents.vue";
 import { fetchCalendarData, defaultParams } from "@/utils/fetchCalendarData";
 
 const route = useRoute();
+const router = useRouter();
 const events = ref([]);
 const isLoading = ref(false);
 const errorMessage = ref("");
@@ -45,6 +46,35 @@ const currentFilters = reactive({
   countryList: [],
   distanceList: [],
   eventTypeList: [],
+});
+
+// Computed property for dynamic event calendar title
+const eventCalendarTitle = computed(() => {
+  let title = "Event Calendar";
+
+  const selectedCountryCode = currentFilters.country;
+  // Find the full country name using the country code
+  const selectedCountry = currentFilters.countryList.find(
+    (country) => country.code === selectedCountryCode
+  );
+
+  if (selectedCountry && selectedCountryCode !== "all") {
+    title += ` for ${selectedCountry.label} (${selectedCountry.code})`;
+  }
+
+  if (currentFilters.year === "past1") {
+    title += " - Past Events";
+  } else if (currentFilters.year === "futur") {
+    title += " - Future Events";
+  } else if (currentFilters.year !== "all") {
+    title += ` - ${currentFilters.year}`;
+  }
+
+  if (currentFilters.dist !== "all") {
+    title += ` - ${currentFilters.dist} Distance`;
+  }
+
+  return title;
 });
 
 // Function to handle filter updates
