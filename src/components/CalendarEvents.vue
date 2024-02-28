@@ -11,7 +11,7 @@
           cols="12"
         >
           <v-card
-            :class="[getEventProps(event.Results).cardClass, 'elevation-1']"
+            :class="[getEventProps(event).cardClass, 'elevation-1']"
             :style="getCardStyle(event.Results)"
           >
             <v-card-title class="race-name py-1 bg-grey-darken-3">
@@ -19,13 +19,13 @@
             </v-card-title>
             <v-alert
               class="mb-2 rounded-0"
-              v-if="getEventProps(event.Results).message"
+              v-if="getEventProps(event).message"
               type="error"
               variant="tonal"
               density="compact"
               text
             >
-              {{ getEventProps(event.Results).message }}
+              {{ getEventProps(event).message }}
             </v-alert>
 
             <v-row class="text-opacity">
@@ -106,20 +106,19 @@
                 </v-btn>
 
                 <v-btn
+                  v-if="getEventProps(event).buttonVisible"
                   class="ma-2 bg-primary"
                   size="small"
                   text
-                  :disabled="getEventProps(event.Results).buttonDisabled"
+                  :disabled="getEventProps(event).buttonDisabled"
                   :href="
-                    getEventProps(event.Results).buttonTo
+                    getEventProps(event).buttonTo
                       ? `/events/${event.EventID}/results`
                       : undefined
                   "
                 >
-                  <v-icon start>{{
-                    getEventProps(event.Results).buttonIcon
-                  }}</v-icon>
-                  {{ getEventProps(event.Results).buttonLabel }}
+                  <v-icon start>{{ getEventProps(event).buttonIcon }}</v-icon>
+                  {{ getEventProps(event).buttonLabel }}
                 </v-btn>
               </v-col>
             </v-row>
@@ -215,16 +214,32 @@ const iconMap = {
   14: "mdi-warehouse", // Walking Indoor
 };
 
-const getEventProps = (resultsStatus) => {
+const getEventProps = (event) => {
+  // Helper function to determine if the event is in the future
+  const isFutureEvent = (eventDate) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set "today" to start of the day
+
+    const eventStartDate = new Date(eventDate);
+    eventStartDate.setHours(0, 0, 0, 0); // Ensure comparison is date-only
+
+    return eventStartDate >= today; // "Today" is considered future
+  };
+
   let props = {
     cardClass: "", // Class to apply different styles
     message: "", // Optional message to display on the card
-    buttonDisabled: false, // Whether the Results button should be disabled
-    buttonLabel: "View Results", // Label for the Results button
+    buttonDisabled: false, // Default state
+    buttonVisible: !(
+      isFutureEvent(event.Startdate) || event.EventType === "10"
+    ),
+    buttonLabel: "View Results", // Default label
     buttonTo: true, // Determines if the button should have a navigation link
-    buttonIcon: "mdi-trophy-outline", // Default icon for the Results button
+    buttonIcon: "mdi-trophy-outline", // Default icon
   };
-  switch (resultsStatus) {
+
+  // Existing switch or conditional logic based on resultsStatus
+  switch (event.Results) {
     case "C": // Completed
     case "P": // Pending
       props.buttonIcon = "mdi-trophy-outline";
@@ -295,6 +310,12 @@ function formatDate(dateString, format) {
     default:
       return dateString; // Return full date for unknown formats
   }
+}
+
+function isEventInFuture(eventDate) {
+  const today = new Date();
+  const eventStartDate = new Date(eventDate);
+  return eventStartDate > today;
 }
 
 function getTypeColor(eventType) {

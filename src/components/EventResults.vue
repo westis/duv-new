@@ -80,13 +80,11 @@ export default {
           theme.value === "dark"
             ? "bg-blue-grey-darken-4"
             : "bg-light-blue-lighten-5";
-        console.log("Applying class:", props.class, "for Male");
       } else if (Gender === "F") {
         props.class =
           theme.value === "dark"
             ? "bg-brown-darken-4 opacity-40"
             : "bg-red-lighten-5";
-        console.log("Applying class:", props.class, "for Female");
       } else {
         console.log("Gender not recognized or missing");
       }
