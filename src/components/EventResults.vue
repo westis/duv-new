@@ -12,9 +12,7 @@
         :row-props="getRowProps"
       >
         <template #[`item.Performance`]="{ item }">
-          <span
-            :style="{ color: getPerformanceColor(item.PerformanceNumeric) }"
-          >
+          <span>
             {{ item.Performance }}
           </span>
         </template>

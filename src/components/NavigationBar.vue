@@ -1,40 +1,35 @@
-// src/components/NavigationBar.vue
 <template>
   <v-app-bar app dense>
-    <!-- Hamburger menu icon -->
     <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
-    <!-- Logo with text for wider screens, symbol only for narrower screens -->
     <v-toolbar-title @click="goHome" style="cursor: pointer">
       <img :src="computedLogo" alt="DUV Logo" class="logo" />
     </v-toolbar-title>
 
-    <!-- Left-aligned Search Component -->
     <SearchComponent class="hidden-md-and-up" />
 
     <v-spacer></v-spacer>
 
-    <!-- SearchComponent for wider screens -->
     <SearchComponent class="hidden-sm-and-down" />
 
-    <!-- Shortcuts -->
-    <!-- Upcoming Events Link -->
     <v-btn
       text
-      :to="{ path: '/events', query: { year: 'futur' } }"
       class="nav-item mx-2 hidden-xs-and-down"
-      >Upcoming Events</v-btn
+      :class="{ 'v-btn--active': isSelectedUpcomingEvents }"
+      @click="navigateTo('/events', { year: 'futur' })"
     >
+      Upcoming Events
+    </v-btn>
 
-    <!-- Results Link -->
     <v-btn
       text
-      :to="{ path: '/events', query: { year: 'past1' } }"
       class="nav-item mx-2 hidden-xs-and-down"
-      >Results</v-btn
+      :class="{ 'v-btn--active': isSelectedResults }"
+      @click="navigateTo('/events', { year: 'past1' })"
     >
+      Results
+    </v-btn>
 
-    <!-- Theme switch icon -->
     <v-btn icon @click="toggleTheme">
       <v-icon>{{ themeIcon }}</v-icon>
     </v-btn>
@@ -56,13 +51,11 @@
 </template>
 
 <script setup>
-import { inject } from "vue";
-import { useRouter } from "vue-router";
-
+import { inject, computed, ref, onMounted, onBeforeUnmount } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import SearchComponent from "./SearchComponent.vue";
-import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 
-// Static imports
+// Static imports for logos
 import logo from "@/assets/duv_logo_with_name.png";
 import logoWhite from "@/assets/duv_logo_with_name_white.png";
 import logoSymbol from "@/assets/duv_logo_symbol.png";
@@ -70,7 +63,11 @@ import logoSymbolWhite from "@/assets/duv_logo_symbol_white.png";
 
 const drawer = ref(false);
 const showTitle = ref(false);
+const route = useRoute();
+const router = useRouter();
+const theme = inject("theme"); // Assuming 'theme' is provided in a parent component
 
+// Computed properties for dynamic logos and theme icon
 const computedLogo = computed(() => {
   if (showTitle.value) {
     return theme.value === "dark" ? logoSymbolWhite : logoSymbol;
@@ -83,39 +80,37 @@ const themeIcon = computed(() =>
   theme.value === "light" ? "mdi-weather-night" : "mdi-white-balance-sunny"
 );
 
+const navigateTo = (path, query) => {
+  router.push({ path, query });
+};
+
+const isSelectedUpcomingEvents = computed(() => {
+  return route.path === "/events" && route.query.year === "futur";
+});
+
+const isSelectedResults = computed(() => {
+  return route.path === "/events" && route.query.year === "past1";
+});
+
 // Navigation Links
 const navItems = [
   { title: "Home", icon: "mdi-home", path: "/" },
-  { title: "Calendar", icon: "mdi-calendar", path: "/events/" },
+  { title: "Events", icon: "mdi-calendar", path: "/events/" },
   { title: "About", icon: "mdi-information", path: "/about" },
 ];
 
-// Window Resizing
-const handleResize = () => {
-  showTitle.value = window.innerWidth < 960;
-};
-
+// Handle window resizing for responsive logo display
 onMounted(() => {
+  const handleResize = () => (showTitle.value = window.innerWidth < 960);
   handleResize();
   window.addEventListener("resize", handleResize);
+  return () => window.removeEventListener("resize", handleResize);
 });
 
-onBeforeUnmount(() => {
-  window.removeEventListener("resize", handleResize);
-});
-
-// Navigation
-const router = useRouter();
-const goHome = () => {
-  router.push({ path: "/" });
-};
-
-// Theme Switching
-const theme = inject("theme");
-
-const toggleTheme = () => {
-  theme.value = theme.value === "light" ? "dark" : "light";
-};
+// Navigation and Theme Switching Functions
+const goHome = () => router.push("/");
+const toggleTheme = () =>
+  (theme.value = theme.value === "light" ? "dark" : "light");
 </script>
 
 <style scoped>
@@ -125,17 +120,23 @@ const toggleTheme = () => {
 
 .nav-item {
   text-transform: none;
-  font-size: 0.875rem; /* Smaller font size for navigation items */
+  font-size: 0.875rem;
 }
 
-/* Hide elements on medium and larger screens */
+/* Style for active navigation link */
+.active-link {
+  background-color: #1976d2; /* Example: a blue background */
+  color: white;
+  border-radius: 4px; /* Optional: adds rounded corners */
+}
+
+/* Hide elements based on screen size */
 .hidden-md-and-up {
   @media (min-width: 960px) {
     display: none;
   }
 }
 
-/* Hide elements on small screens */
 .hidden-sm-and-down {
   @media (max-width: 959px) {
     display: none;
