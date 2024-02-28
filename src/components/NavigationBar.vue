@@ -81,15 +81,31 @@ const themeIcon = computed(() =>
 );
 
 const navigateTo = (path, query) => {
-  router.push({ path, query });
+  // Retain all existing query parameters except those being explicitly changed
+  const newQuery = {
+    ...route.query,
+    ...query,
+  };
+
+  router.push({ path, query: newQuery });
 };
 
+const currentYear = new Date().getFullYear();
+
 const isSelectedUpcomingEvents = computed(() => {
-  return route.path === "/events" && route.query.year === "futur";
+  const yearQuery = route.query.year;
+  // Future events are selected by "futur" or a year greater than the current year
+  return (
+    yearQuery === "futur" || (yearQuery && parseInt(yearQuery) > currentYear)
+  );
 });
 
 const isSelectedResults = computed(() => {
-  return route.path === "/events" && route.query.year === "past1";
+  const yearQuery = route.query.year;
+  // Past events are selected by "past1" or a year less than the current year
+  return (
+    yearQuery === "past1" || (yearQuery && parseInt(yearQuery) < currentYear)
+  );
 });
 
 // Navigation Links

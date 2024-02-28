@@ -50,31 +50,33 @@ const currentFilters = reactive({
 
 // Computed property for dynamic event calendar title
 const eventCalendarTitle = computed(() => {
-  let title = "Event Calendar";
+  let titleParts = [];
 
+  // Adjusting for Future and Past Events
+  if (currentFilters.year === "past1") {
+    titleParts.push("Past Events");
+  } else if (currentFilters.year === "futur") {
+    titleParts.push("Future Events");
+  } else if (currentFilters.year !== "all") {
+    // Adjusting format for specific years
+    titleParts.push(`Events in ${currentFilters.year}`);
+  }
+
+  // Append country information if selected
   const selectedCountryCode = currentFilters.country;
-  // Find the full country name using the country code
   const selectedCountry = currentFilters.countryList.find(
     (country) => country.code === selectedCountryCode
   );
-
   if (selectedCountry && selectedCountryCode !== "all") {
-    title += ` for ${selectedCountry.label} (${selectedCountry.code})`;
+    titleParts.push(`for ${selectedCountry.label} (${selectedCountry.code})`);
   }
 
-  if (currentFilters.year === "past1") {
-    title += " - Past Events";
-  } else if (currentFilters.year === "futur") {
-    title += " - Future Events";
-  } else if (currentFilters.year !== "all") {
-    title += ` - ${currentFilters.year}`;
-  }
-
+  // Append distance information if selected
   if (currentFilters.dist !== "all") {
-    title += ` - ${currentFilters.dist} Distance`;
+    titleParts.push(` - ${currentFilters.dist}`);
   }
 
-  return title;
+  return titleParts.join(" ");
 });
 
 // Function to handle filter updates
