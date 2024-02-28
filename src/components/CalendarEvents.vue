@@ -12,6 +12,7 @@
         >
           <v-card
             :class="[getEventProps(event.Results).cardClass, 'elevation-1']"
+            :style="getCardStyle(event.Results)"
           >
             <v-card-title class="race-name py-1 bg-grey-darken-3">
               {{ event.EventName }}
@@ -20,14 +21,14 @@
               class="mb-2 rounded-0"
               v-if="getEventProps(event.Results).message"
               type="error"
-              variant="outlined"
+              variant="tonal"
               density="compact"
               text
             >
               {{ getEventProps(event.Results).message }}
             </v-alert>
 
-            <v-row>
+            <v-row class="text-opacity">
               <v-col cols="3" sm="2" xl="1" class="py-5 px-6">
                 <v-sheet
                   class="pa-1 d-flex flex-column align-center rounded-lg date-container"
@@ -70,7 +71,7 @@
                     label
                     class="mx-2 my-1"
                     size="small"
-                    v-if="event.Duration && event.EventType !== 10"
+                    v-if="event.Duration && event.EventType !== '10'"
                     :color="getTypeColor(16)"
                   >
                     <v-icon start>mdi-timer</v-icon>{{ event.Duration }}
@@ -235,7 +236,8 @@ const getEventProps = (resultsStatus) => {
       props.buttonIcon = "mdi-close-box-outline";
       break;
     case "R": // Cancelled
-      props.cardClass = "race-cancelled";
+      props.cardClass =
+        theme.value === "dark" ? "race-cancelled-dark" : "race-cancelled-light";
       props.message = "This race has been cancelled.";
       props.buttonDisabled = true;
       props.buttonLabel = "Cancelled";
@@ -302,6 +304,20 @@ function getTypeColor(eventType) {
 function getEventIcon(eventType) {
   return iconMap[eventType] || "mdi-help-circle";
 }
+
+const getCardStyle = (resultsStatus) => {
+  /* if (resultsStatus === "R") {
+    return {
+      borderColor:
+        theme.value === "dark"
+          ? "rgb(var(--v-theme-error))"
+          : "rgb(var(--v-theme-error))",
+      borderWidth: "1px",
+      borderStyle: "solid",
+    };
+  } */
+  return {};
+};
 
 function filteredEventTypes(eventType) {
   const typeIndex = +eventType - 1;

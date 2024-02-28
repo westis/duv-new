@@ -13,6 +13,7 @@ import { createVuetify } from "vuetify";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 import "@mdi/font/css/materialdesignicons.css";
+import colors from "vuetify/util/colors";
 
 const vuetify = createVuetify({
   components,
@@ -23,9 +24,8 @@ const vuetify = createVuetify({
       light: {
         // Your light theme colors
         colors: {
-          primary: "#FEA541",
-          secondary: "#5CBBF6",
-          // ... other light theme colors
+          primary: colors.red.darken1, // #E53935
+          secondary: colors.red.lighten4, // #FFCDD2
         },
       },
       dark: {
