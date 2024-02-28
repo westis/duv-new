@@ -16,25 +16,29 @@ import axios from "axios";
 
 const baseUrl = "https://statistik.d-u-v.org/json/mcalendar.php";
 
-export async function fetchCalendarData(params = {}) {
-  const defaultParams = {
-    year: "futur",
-    dist: "all",
-    country: "all",
-    cups: "all",
-    rproof: 0,
-    mode: "list",
-  };
+export const defaultParams = {
+  year: "futur",
+  dist: "all",
+  country: "all",
+  cups: "all",
+  rproof: 0,
+  mode: "list",
+};
 
+export async function fetchCalendarData(params = {}) {
   const mergedParams = { ...defaultParams, ...params };
 
-  // Pagination and filtering parameters (if needed); update as necessary
+  // If there's pagination, override the page parameter
   if (params.pagination) {
     mergedParams.page = params.pagination.page;
   }
+
+  // Ensure default values are used if filters are cleared
   if (params.filters) {
-    mergedParams.eventType = params.filters.eventType;
-    mergedParams.dist = params.filters.dist;
+    mergedParams.country = params.filters.country || defaultParams.country;
+    mergedParams.eventType = params.filters.eventType || defaultParams.mode;
+    mergedParams.dist = params.filters.dist || defaultParams.dist;
+    // Add similar lines for other filters as necessary
   }
 
   // Construct the query string using URLSearchParams for robust encoding

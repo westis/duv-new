@@ -7,7 +7,8 @@
     <CalendarFilters
       :year-list="filters.yearList"
       :country-list="filters.countryList"
-      :type-list="filters.eventTypeList"
+      :event-type-list="filters.eventTypeList"
+      :distance-list="filters.distanceList"
       @filter-updated="fetchEvents"
     />
 
@@ -29,7 +30,12 @@ export default {
   components: { CalendarFilters, CalendarEvents },
   setup() {
     const events = ref([]);
-    const filters = ref({ yearList: [], countryList: [], eventTypeList: [] });
+    const filters = ref({
+      yearList: [],
+      countryList: [],
+      eventTypeList: [],
+      distanceList: [],
+    });
     const isLoading = ref(false); // For loading state
     const errorMessage = ref(null);
 

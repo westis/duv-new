@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card class="mt-3">
     <v-card-title>Results: {{ eventHeader.SearchRsltCnt }}</v-card-title>
     <v-card-text>
       <v-data-table
@@ -7,6 +7,7 @@
         :items="resultList"
         :items-per-page="10"
         class="elevation-1"
+        :row-props="getRowProps"
       >
         <template #[`item.Performance`]="{ item }">
           <span
@@ -21,7 +22,7 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, inject } from "vue";
 
 export default {
   props: {
@@ -35,6 +36,9 @@ export default {
     },
   },
   setup(props) {
+    // Inject the theme state, assuming the parent component provides it
+    const theme = inject("theme", ref("light")); // Default to 'light' if not provided
+
     const headers = ref([
       { title: "Rank", value: "RankTotal" },
       { title: "Performance", value: "Performance" },
@@ -64,10 +68,53 @@ export default {
       return `hsl(${hue}, 100%, 50%)`;
     };
 
+    // Function to get the class for a row based on the gender and theme
+    const getRowProps = ({ item }) => {
+      const { Gender } = item; // Destructure Gender
+
+      let props = {};
+      if (Gender === "M") {
+        props.class =
+          theme.value === "dark"
+            ? "bg-blue-grey-darken-4"
+            : "bg-light-blue-lighten-5";
+        console.log("Applying class:", props.class, "for Male");
+      } else if (Gender === "F") {
+        props.class =
+          theme.value === "dark"
+            ? "bg-brown-darken-4 opacity-40"
+            : "bg-red-lighten-5";
+        console.log("Applying class:", props.class, "for Female");
+      } else {
+        console.log("Gender not recognized or missing");
+      }
+
+      return props;
+    };
+
     return {
       headers,
       getPerformanceColor,
+      getRowProps,
     };
   },
 };
 </script>
+
+<style scoped>
+.light-blue {
+  background-color: #add8e6; /* light blue */
+}
+
+.v-data-table__tr.dark-blue {
+  background-color: #0000cd; /* dark blue */
+}
+
+.v-data-table__tr.light-red {
+  background-color: #f08080; /* light red */
+}
+
+.v-data-table__tr.dark-red {
+  background-color: #8b0000; /* dark red */
+}
+</style>

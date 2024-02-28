@@ -1,27 +1,33 @@
+// EventResultsFilters.vue
+
 <template>
   <div class="event-results-filters pa-2">
     <v-row>
-      <v-col cols="3">
+      <v-col class="py-1 px-1" cols="6" md="2" sm="4">
         <v-select
           v-model="selectedAgeCategory"
           :items="ageCategories"
+          item-title="label"
+          item-value="value"
           label="Age Category"
+          hide-details="auto"
           clearable
         ></v-select>
       </v-col>
-      <v-col cols="3">
+      <v-col class="py-1 px-1" cols="6" md="3" sm="4">
         <v-autocomplete
+          auto-select-first
+          clearable
           v-model="selectedCountry"
-          :items="countries"
-          item-text="label"
+          :items="countryList"
+          hide-details="auto"
+          item-title="label"
           item-value="code"
           label="Country"
-          return-object
-          clearable
         ></v-autocomplete>
       </v-col>
       <v-col cols="4">
-        <v-btn @click="applyFilters">Apply Filters</v-btn>
+        <v-btn @click="emitFilters">Apply Filters</v-btn>
       </v-col>
     </v-row>
   </div>
@@ -29,28 +35,36 @@
 
 <script>
 import { ref } from "vue";
+import { defaultEventResultsParams } from "@/utils/fetchEventResults";
 
 export default {
   props: {
-    ageCategories: { type: Array, default: () => [] },
-    countries: { type: Array, default: () => [] },
+    ageCategories: { type: Array, required: true },
+    countryList: { type: Array, required: true },
   },
-  emits: ["filter"], // Emitting an event to the parent component when filters are applied
+  emits: ["filter-updated"],
   setup(props, { emit }) {
-    // Reactive properties to hold the selected values of age category and country
-    const selectedAgeCategory = ref("");
-    const selectedCountry = ref("");
+    // Log the props to see if they contain the expected data
+    console.log("ageCategories:", props.ageCategories);
+    console.log("countryList:", props.countryList);
+    const selectedAgeCategory = ref(null);
+    const selectedCountry = ref(null);
 
-    // Function to be called when the user applies filters
-    const applyFilters = () => {
-      emit("filter", {
-        ageCategory: selectedAgeCategory.value,
-        country: selectedCountry.value,
-      });
+    const emitFilters = () => {
+      const filterOptions = {
+        cat: selectedAgeCategory.value || defaultEventResultsParams.cat,
+        country: selectedCountry.value || defaultEventResultsParams.country,
+        // Ensure any additional filters are handled similarly
+      };
+      emit("filter-updated", filterOptions);
     };
 
-    // Returning reactive properties and functions so they can be used in the template
-    return { selectedAgeCategory, selectedCountry, applyFilters };
+    // Directly return local reactive states and methods; props are automatically available in the template
+    return {
+      selectedAgeCategory,
+      selectedCountry,
+      emitFilters,
+    };
   },
 };
 </script>

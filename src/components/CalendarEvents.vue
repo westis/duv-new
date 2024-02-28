@@ -2,12 +2,29 @@
   <div v-if="isLoading">Loading...</div>
   <div v-else-if="events.length > 0">
     <v-container>
-      <v-row>
-        <v-col v-for="event in paginatedEvents" :key="event.EventID" cols="12">
-          <v-card class="elevation-1">
+      <v-row class="mt-2">
+        <v-col
+          class="pa-0 mb-3"
+          v-for="event in paginatedEvents"
+          :key="event.EventID"
+          cols="12"
+        >
+          <v-card
+            :class="[getEventProps(event.Results).cardClass, 'elevation-1']"
+          >
             <v-card-title class="race-name py-1 bg-grey-darken-3">
               {{ event.EventName }}
             </v-card-title>
+            <v-alert
+              class="mb-2 rounded-0"
+              v-if="getEventProps(event.Results).message"
+              type="error"
+              variant="outlined"
+              density="compact"
+              text
+            >
+              {{ getEventProps(event.Results).message }}
+            </v-alert>
 
             <v-row>
               <v-col cols="3" sm="2" xl="1" class="py-5 px-6">
@@ -90,10 +107,17 @@
                   class="ma-2 bg-primary"
                   size="small"
                   text
-                  :to="`/results/${event.EventID}`"
+                  :disabled="getEventProps(event.Results).buttonDisabled"
+                  :href="
+                    getEventProps(event.Results).buttonTo
+                      ? `/results/${event.EventID}`
+                      : undefined
+                  "
                 >
-                  <v-icon start>mdi-trophy-outline</v-icon>
-                  Results
+                  <v-icon start>{{
+                    getEventProps(event.Results).buttonIcon
+                  }}</v-icon>
+                  {{ getEventProps(event.Results).buttonLabel }}
                 </v-btn>
               </v-col>
             </v-row>
@@ -143,7 +167,7 @@ const typeNameMap = {
   indoor: "Indoor",
   "friendship run, no competition": "Friendship",
   "invitational race": "Invitational",
-  "elimination race": "Elimination",
+  "elimination race": "Elimination Race",
   "Backyard Ultra": "Backyard Ultra",
   "walking road": "Walk (Road)",
   "walking road on a loop < 5km/3mi": "Walk Loop",
@@ -187,6 +211,53 @@ const iconMap = {
   12: "mdi-foot-print", // Walking Road (Loop)
   13: "mdi-map-marker-path", // Walking Track
   14: "mdi-warehouse", // Walking Indoor
+};
+
+const getEventProps = (resultsStatus) => {
+  let props = {
+    cardClass: "", // Class to apply different styles
+    message: "", // Optional message to display on the card
+    buttonDisabled: false, // Whether the Results button should be disabled
+    buttonLabel: "View Results", // Label for the Results button
+    buttonTo: true, // Determines if the button should have a navigation link
+    buttonIcon: "mdi-trophy-outline", // Default icon for the Results button
+  };
+  switch (resultsStatus) {
+    case "C": // Completed
+    case "P": // Pending
+      props.buttonIcon = "mdi-trophy-outline";
+      break;
+    case "N": // No Results
+      props.buttonDisabled = true;
+      props.buttonLabel = "No Results";
+      props.buttonTo = false;
+      props.buttonIcon = "mdi-close-box-outline";
+      break;
+    case "R": // Cancelled
+      props.cardClass = "race-cancelled";
+      props.message = "This race has been cancelled.";
+      props.buttonDisabled = true;
+      props.buttonLabel = "Cancelled";
+      props.buttonTo = false;
+      props.buttonIcon = "mdi-cancel";
+      break;
+    case "Z": // No Finishers
+      props.buttonDisabled = true;
+      props.buttonLabel = "No Finishers";
+      props.buttonTo = false;
+      props.buttonIcon = "mdi-emoticon-sad-outline";
+      break;
+    case "O": // Postponed
+      props.cardClass = "race-postponed";
+      props.message = "This race has been postponed.";
+      props.buttonDisabled = true;
+      props.buttonTo = false;
+      props.buttonIcon = "mdi-clock-outline";
+      break;
+    // Add more cases as needed
+  }
+
+  return props;
 };
 
 // Computed properties for pagination and event type mapping
