@@ -1,7 +1,9 @@
 import axios from "axios";
 
 // Define the base URL for fetching event results
-const resultsBaseUrl = "https://statistik.d-u-v.org/json/mgetresultevent.php";
+const resultsBaseUrl = `${
+  import.meta.env.VITE_API_BASE_URL
+}/mgetresultevent.php`;
 
 // Define default parameters for event results fetching
 export const defaultEventResultsParams = {

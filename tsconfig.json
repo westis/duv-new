@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "esnext", // Target modern ECMAScript features
+    "module": "esnext", // Use ECMAScript modules
+    "baseUrl": "./", // Base directory to resolve non-relative module names
+    "moduleResolution": "Bundler", // Module resolution strategy
+    "paths": {
+      "@/*": ["src/*"] // Alias '@' to 'src' directory
+    },
+    "lib": ["esnext", "dom", "dom.iterable", "scripthost"], // Include typings for DOM and latest ECMAScript features
+    "allowJs": true, // Allow JavaScript files to be compiled
+    "skipLibCheck": true, // Skip type checking of declaration files
+    "esModuleInterop": true, // Enables compatibility with Babel/TypeScript-generated ES modules
+    "forceConsistentCasingInFileNames": true, // Ensure case sensitivity in file names
+    "strict": true, // Enable all strict type-checking options
+    "jsx": "preserve", // Preserve JSX code for further transformation (e.g., by Babel or Vue)
+    "types": [
+      // other types...
+      "unplugin-vue-router/client"
+    ]
+  },
+  "include": [
+    "src/**/*.ts", // Include all TypeScript files in src
+    "src/**/*.vue", // Include Vue single-file components
+    "src/**/*.tsx", // Include TSX files if you use JSX in components
+    "./typed-router.d.ts"
+  ],
+  "exclude": [
+    "node_modules" // Exclude the node_modules directory from compilation
+  ]
+}

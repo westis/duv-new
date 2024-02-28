@@ -1,3 +1,5 @@
+// src/components/EventResults.vue
+
 <template>
   <v-card class="mt-3">
     <v-card-title>Results: {{ eventHeader.SearchRsltCnt }}</v-card-title>

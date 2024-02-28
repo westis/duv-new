@@ -14,7 +14,7 @@
 
 import axios from "axios";
 
-const baseUrl = "https://statistik.d-u-v.org/json/mcalendar.php";
+const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/mcalendar.php`;
 
 export const defaultParams = {
   year: "futur",
@@ -23,26 +23,27 @@ export const defaultParams = {
   cups: "all",
   rproof: 0,
   mode: "list",
+  page: 1,
 };
 
 export async function fetchCalendarData(params = {}) {
-  const mergedParams = { ...defaultParams, ...params };
-
-  // If there's pagination, override the page parameter
-  if (params.pagination) {
-    mergedParams.page = params.pagination.page;
-  }
-
-  // Ensure default values are used if filters are cleared
-  if (params.filters) {
-    mergedParams.country = params.filters.country || defaultParams.country;
-    mergedParams.eventType = params.filters.eventType || defaultParams.mode;
-    mergedParams.dist = params.filters.dist || defaultParams.dist;
-    // Add similar lines for other filters as necessary
-  }
+  // Prepare API parameters by renaming or adjusting as necessary
+  const apiParams = {
+    year: params.year,
+    dist: params.dist,
+    country: params.country,
+    // No need for 'eventType' if it's not used by the API yet.
+    // If the API expects different parameter names or additional processing,
+    // handle that here.
+    cups: params.cups || defaultParams.cups,
+    rproof: params.rproof || defaultParams.rproof,
+    mode: params.mode || defaultParams.mode,
+    // Include pagination if needed
+    page: params.page || defaultParams.page,
+  };
 
   // Construct the query string using URLSearchParams for robust encoding
-  const queryString = new URLSearchParams(mergedParams).toString();
+  const queryString = new URLSearchParams(apiParams).toString();
 
   try {
     const response = await axios.get(`${baseUrl}?${queryString}`);
@@ -62,19 +63,17 @@ export async function fetchCalendarData(params = {}) {
             value,
             label: response.data.FltDistLabel[index],
           })),
-          eventTypeList: response.data.FltEventTypes,
+          // eventTypeList for future use
+          eventTypeList: response.data.FltEventTypes || [],
         },
       };
     } catch (parseError) {
-      // Handle JSON parsing error
       console.error("Error parsing JSON response:", parseError);
       throw new Error("Invalid JSON data");
     }
   } catch (fetchError) {
-    // Handle errors related to the fetch request itself
     console.error("Error fetching data:", fetchError);
     if (fetchError.response) {
-      // API might return an error status code and/or message
       throw new Error(
         `API Error: ${fetchError.response.status} - ${fetchError.response.statusText}`
       );

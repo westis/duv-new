@@ -1,3 +1,5 @@
+// src/components/EventResultsHeader.vue
+
 <template>
   <v-card class="mb-5">
     <v-card-title class="headline">{{ eventHeader.EventName }}</v-card-title>

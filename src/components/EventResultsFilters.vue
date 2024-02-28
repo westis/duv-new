@@ -1,4 +1,4 @@
-// EventResultsFilters.vue
+// src/components/EventResultsFilters.vue
 
 <template>
   <div class="event-results-filters pa-2">

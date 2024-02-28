@@ -1,3 +1,4 @@
+// App.vue
 <template>
   <v-theme-provider :theme="theme">
     <v-app :class="['app-container', theme]">
@@ -18,6 +19,6 @@
 import { ref, provide } from "vue";
 import NavigationBar from "./components/NavigationBar.vue";
 
-const theme = ref("light");
+const theme = ref("dark");
 provide("theme", theme);
 </script>

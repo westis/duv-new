@@ -1,3 +1,4 @@
+// src/components/CalendarFilters.vue
 <template>
   <div class="filters pa-2">
     <v-row>
@@ -25,7 +26,7 @@
         </v-autocomplete>
       </v-col>
 
-      <v-col class="py-1 px-1" cols="6" md="2" sm="4">
+      <!-- <v-col class="py-1 px-1" cols="6" md="2" sm="4">
         <v-select
           v-model="selectedEventType"
           hide-details="auto"
@@ -33,9 +34,9 @@
           label="Type"
         >
         </v-select>
-      </v-col>
+      </v-col> -->
 
-      <v-col class="py-1 px-1" cols="6" md="3" sm="4">
+      <v-col class="py-1 px-1" cols="6" md="2" sm="4">
         <v-select
           v-model="selectedDistance"
           :items="distanceList"
@@ -48,49 +49,59 @@
       </v-col>
 
       <v-col cols="6" md="4" sm="4">
-        <v-btn @click="emitFilters" color="primary">Apply Filter</v-btn>
+        <v-btn @click="applyFilters" color="primary">Apply Filters</v-btn>
       </v-col>
     </v-row>
   </div>
 </template>
 
-<script>
-import { ref } from "vue";
-import { defaultParams } from "../utils/fetchCalendarData";
+<script setup>
+import { ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
-export default {
-  props: {
-    yearList: { type: Array, required: true },
-    countryList: { type: Array, default: () => [] },
-    eventTypeList: { type: Array, required: true },
-    distanceList: { type: Array, required: true },
+const route = useRoute();
+const router = useRouter();
+
+// Assuming props are already defined to pass down the filter options lists
+const props = defineProps({
+  yearList: Array,
+  countryList: Array,
+  distanceList: Array,
+  eventTypeList: Array, // If you are using eventType
+});
+
+// Initialize selected filters based on URL query parameters
+const selectedYear = ref(route.query.year || "all");
+const selectedCountry = ref(route.query.country || "all");
+const selectedDistance = ref(route.query.dist || "all");
+// Initialize selectedEventType if you are using eventType
+
+// Watch for changes in selected filters and update the URL accordingly
+/* watch(
+  [selectedYear, selectedCountry, selectedDistance],
+  () => {
+    router.replace({
+      path: "/events",
+      query: {
+        year: selectedYear.value || undefined, // Fallback to undefined if cleared
+        country: selectedCountry.value || undefined,
+        dist: selectedDistance.value || undefined,
+      },
+    });
   },
-  emits: ["filter-updated"],
-  setup(props, { emit }) {
-    console.log("Props countryList", props.countryList);
-    const selectedYear = ref("all");
-    const selectedCountry = ref("all");
-    const selectedEventType = ref("all");
-    const selectedDistance = ref("all");
-    // ... Add refs  for other filters
+  { immediate: true }
+); */
 
-    const emitFilters = () => {
-      const filterOptions = {
-        year: selectedYear.value || defaultParams.year,
-        country: selectedCountry.value || defaultParams.country,
-        eventType: selectedEventType.value || defaultParams.mode,
-        distance: selectedDistance.value || defaultParams.mode,
-      };
-      emit("filter-updated", filterOptions);
-    };
-
-    return {
-      selectedYear,
-      selectedCountry,
-      selectedEventType,
-      selectedDistance,
-      emitFilters,
-    };
-  },
+// If you have an "Apply Filters" button or similar, you can use a method to update the route
+// This might be redundant if you're already watching filter changes as above
+const applyFilters = () => {
+  router.replace({
+    path: "/events",
+    query: {
+      year: selectedYear.value || undefined, // Fallback to undefined if cleared
+      country: selectedCountry.value || undefined,
+      dist: selectedDistance.value || undefined,
+    },
+  });
 };
 </script>

@@ -26,10 +26,10 @@ const showTitle = ref(false);
 const theme = inject("theme");
 
 // Logo logic
-const logo = require("@/assets/duv_logo_with_name.png");
-const logoWhite = require("@/assets/duv_logo_with_name_white.png");
-const logoSymbol = require("@/assets/duv_logo_symbol.png");
-const logoSymbolWhite = require("@/assets/duv_logo_symbol_white.png");
+import logo from "@/assets/duv_logo_with_name.png";
+import logoWhite from "@/assets/duv_logo_with_name_white.png";
+import logoSymbol from "@/assets/duv_logo_symbol.png";
+import logoSymbolWhite from "@/assets/duv_logo_symbol_white.png";
 
 const computedLogo = computed(() => {
   if (showTitle.value) {

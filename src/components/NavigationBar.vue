@@ -1,3 +1,4 @@
+// src/components/NavigationBar.vue
 <template>
   <v-app-bar app dense>
     <!-- Hamburger menu icon -->
@@ -17,10 +18,19 @@
     <SearchComponent class="hidden-sm-and-down" />
 
     <!-- Shortcuts -->
-    <v-btn text :to="{ name: 'calendar' }" class="nav-item hidden-xs-and-down"
-      >Calendar</v-btn
+    <!-- Upcoming Events Link -->
+    <v-btn
+      text
+      :to="{ path: '/events', query: { year: 'futur' } }"
+      class="nav-item mx-2 hidden-xs-and-down"
+      >Upcoming Events</v-btn
     >
-    <v-btn text :to="{ name: 'results' }" class="nav-item hidden-xs-and-down"
+
+    <!-- Results Link -->
+    <v-btn
+      text
+      :to="{ path: '/events', query: { year: 'past1' } }"
+      class="nav-item mx-2 hidden-xs-and-down"
       >Results</v-btn
     >
 
@@ -36,7 +46,7 @@
         v-for="item in navItems"
         :key="item.title"
         link
-        :to="{ name: item.routeName }"
+        :to="{ path: item.path }"
         :title="item.title"
         :prepend-icon="item.icon"
       >
@@ -52,14 +62,14 @@ import { useRouter } from "vue-router";
 import SearchComponent from "./SearchComponent.vue";
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 
+// Static imports
+import logo from "@/assets/duv_logo_with_name.png";
+import logoWhite from "@/assets/duv_logo_with_name_white.png";
+import logoSymbol from "@/assets/duv_logo_symbol.png";
+import logoSymbolWhite from "@/assets/duv_logo_symbol_white.png";
+
 const drawer = ref(false);
 const showTitle = ref(false);
-
-// Logo logic
-const logo = require("@/assets/duv_logo_with_name.png");
-const logoWhite = require("@/assets/duv_logo_with_name_white.png");
-const logoSymbol = require("@/assets/duv_logo_symbol.png");
-const logoSymbolWhite = require("@/assets/duv_logo_symbol_white.png");
 
 const computedLogo = computed(() => {
   if (showTitle.value) {
@@ -75,10 +85,9 @@ const themeIcon = computed(() =>
 
 // Navigation Links
 const navItems = [
-  { title: "Home", routeName: "home", icon: "mdi-home" },
-  { title: "Calendar", routeName: "calendar", icon: "mdi-calendar" },
-  { title: "Results", routeName: "results", icon: "mdi-trophy" },
-  { title: "About", routeName: "about", icon: "mdi-information" },
+  { title: "Home", icon: "mdi-home", path: "/" },
+  { title: "Calendar", icon: "mdi-calendar", path: "/events/" },
+  { title: "About", icon: "mdi-information", path: "/about" },
 ];
 
 // Window Resizing
@@ -98,7 +107,7 @@ onBeforeUnmount(() => {
 // Navigation
 const router = useRouter();
 const goHome = () => {
-  router.push({ name: "home" });
+  router.push({ path: "/" });
 };
 
 // Theme Switching

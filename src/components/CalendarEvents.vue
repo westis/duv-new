@@ -1,3 +1,4 @@
+// src/components/CalendarEvents.vue
 <template>
   <div v-if="isLoading">Loading...</div>
   <div v-else-if="events.length > 0">
@@ -110,7 +111,7 @@
                   :disabled="getEventProps(event.Results).buttonDisabled"
                   :href="
                     getEventProps(event.Results).buttonTo
-                      ? `/results/${event.EventID}`
+                      ? `/events/${event.EventID}/results`
                       : undefined
                   "
                 >
@@ -135,7 +136,7 @@
 </template>
 
 <script setup>
-import { ref, computed, defineProps, inject } from "vue";
+import { ref, computed, inject } from "vue";
 import { watchEffect } from "vue";
 
 // Props

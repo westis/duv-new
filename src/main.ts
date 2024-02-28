@@ -1,8 +1,8 @@
-// file path: src/main.js
+// file path: src/main.ts
 
 import { createApp } from "vue";
 import App from "./App.vue";
-import router from "./router";
+import { createRouter, createWebHistory } from "vue-router/auto";
 import store from "./store";
 import NavigationBar from "./components/NavigationBar.vue"; // Import NavigationBar
 import "./assets/main.css";
@@ -40,9 +40,13 @@ const vuetify = createVuetify({
   },
 });
 
+const router = createRouter({
+  history: createWebHistory(),
+  // the routes property is handled by the plugin
+});
+
 const app = createApp(App);
 app.use(store);
 app.use(router);
 app.use(vuetify);
-app.component("NavigationBar", NavigationBar); // Register NavigationBar globally
 app.mount("#app");
