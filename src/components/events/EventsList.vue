@@ -136,25 +136,32 @@
 </template>
 
 <script setup>
-import { useThemeStore } from "@/stores/ThemeStore";
-// Props
-const props = defineProps({
-  events: { type: Array, required: true },
-  isLoading: { type: Boolean, required: true },
-  eventTypeList: { type: Array, required: true },
-});
+import { storeToRefs } from "pinia";
+import { useEventsStore } from "@/stores/EventsStore"; // Adjust the path as necessary
 
-// Access the provided theme state
+import { useThemeStore } from "@/stores/ThemeStore";
 const themeStore = useThemeStore();
+
+// Use the events store
+const eventsStore = useEventsStore();
+
+// Access state and actions from the store
+const { events, isLoading } = storeToRefs(eventsStore);
+
+const props = defineProps({
+  events: Array,
+  isLoading: Boolean,
+  eventTypeList: Array,
+});
 
 watchEffect(() => {
   console.log("Theme changed to:", themeStore.currentTheme);
 });
 
-// Reactive states
+// Reactive states for pagination
 const currentPage = ref(1);
 const itemsPerPage = ref(10);
-const totalItems = computed(() => props.events.length);
+const totalItems = computed(() => events.value.length);
 
 // Type name map
 const typeNameMap = {
@@ -301,7 +308,7 @@ const totalPages = computed(() =>
 const paginatedEvents = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage.value;
   const end = start + itemsPerPage.value;
-  return props.events.slice(start, end);
+  return events.value.slice(start, end); // Use events from store, not props
 });
 
 // Methods

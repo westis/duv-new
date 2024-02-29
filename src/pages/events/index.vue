@@ -20,88 +20,64 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, computed, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { fetchCalendarData, defaultParams } from "@/utils/fetchCalendarData";
+import { useEventsStore } from "@/stores/EventsStore";
+import { storeToRefs } from "pinia";
 
 const route = useRoute();
-const events = ref([]);
-const isLoading = ref(false);
-const errorMessage = ref("");
+const eventsStore = useEventsStore();
 
-// Setup a reactive state for the current filters
-const currentFilters = reactive({
-  year: route.query.year || defaultParams.year,
-  country: route.query.country || defaultParams.country,
-  dist: route.query.dist || defaultParams.dist,
-  type: route.query.type || defaultParams.type,
-  yearList: [],
-  countryList: [],
-  distanceList: [],
-  eventTypeList: [],
-});
+// Utilize Pinia store state and actions
+const { events, isLoading, errorMessage, currentFilters } =
+  storeToRefs(eventsStore);
 
 const eventCalendarTitle = computed(() => {
   let titleParts = [];
-  if (currentFilters.year === "past1") {
+  // Access refs with .value when within the Composition API context
+  if (currentFilters.value.year === "past1") {
     titleParts.push("Past Events");
-  } else if (currentFilters.year === "futur") {
+  } else if (currentFilters.value.year === "futur") {
     titleParts.push("Future Events");
-  } else if (currentFilters.year !== "all") {
-    titleParts.push(`Events in ${currentFilters.year}`);
+  } else if (currentFilters.value.year !== "all") {
+    titleParts.push(`Events in ${currentFilters.value.year}`);
   }
-  const selectedCountry = currentFilters.countryList.find(
-    (country) => country.code === currentFilters.country
+  // Correct usage of .find on a ref array by accessing .value
+  const selectedCountry = currentFilters.value.countryList.find(
+    (country) => country.code === currentFilters.value.country
   );
-  if (selectedCountry && currentFilters.country !== "all") {
+  if (selectedCountry && currentFilters.value.country !== "all") {
     titleParts.push(`for ${selectedCountry.label} (${selectedCountry.code})`);
   }
-  if (currentFilters.dist !== "all") {
-    titleParts.push(` - ${currentFilters.dist}`);
+  if (currentFilters.value.dist !== "all") {
+    titleParts.push(` - ${currentFilters.value.dist}`);
   }
   return titleParts.join(" ");
 });
 
 // Handle updates from the EventsFilter component
 const handleFilterUpdate = (newFilters) => {
-  Object.assign(currentFilters, newFilters);
-  fetchEvents();
+  eventsStore.updateFiltersAndFetch(newFilters);
 };
 
-const fetchEvents = async () => {
-  isLoading.value = true;
-  errorMessage.value = "";
-  try {
-    const response = await fetchCalendarData({
-      year: currentFilters.year,
-      country: currentFilters.country,
-      dist: currentFilters.dist,
-      type: currentFilters.type,
-    });
-    events.value = response.events;
-    // Assuming response.filters contains updated lists
-    Object.assign(currentFilters, response.filters);
-  } catch (error) {
-    errorMessage.value = error.message || "Failed to load events.";
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-// Watch for route query changes to update filters and fetch new events
+// Watching for route query changes to update filters and fetch new events
 watch(
   () => route.query,
   (newQuery) => {
-    currentFilters.year = newQuery.year || defaultParams.year;
-    currentFilters.country = newQuery.country || defaultParams.country;
-    currentFilters.dist = newQuery.dist || defaultParams.dist;
-    currentFilters.type = newQuery.type || defaultParams.type;
-    fetchEvents();
+    eventsStore.currentFilters.year =
+      newQuery.year || eventsStore.currentFilters.year;
+    eventsStore.currentFilters.country =
+      newQuery.country || eventsStore.currentFilters.country;
+    eventsStore.currentFilters.dist =
+      newQuery.dist || eventsStore.currentFilters.dist;
+    eventsStore.currentFilters.type =
+      newQuery.type || eventsStore.currentFilters.type;
+    eventsStore.fetchEvents();
   },
   { deep: true }
 );
 
-onMounted(fetchEvents);
+onMounted(() => {
+  eventsStore.fetchEvents();
+});
 </script>
 
 <style scoped>

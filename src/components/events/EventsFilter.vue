@@ -56,9 +56,14 @@
 </template>
 
 <script setup>
+import { storeToRefs } from "pinia";
+import { useEventsStore } from "@/stores/EventsStore";
+
 const route = useRoute();
 const router = useRouter();
+const eventsStore = useEventsStore();
 
+// Define props that `EventsFilter` expects to receive
 const props = defineProps({
   yearList: Array,
   countryList: Array,
@@ -66,13 +71,12 @@ const props = defineProps({
   eventTypeList: Array,
 });
 
-const selectedYear = ref(route.query.year || "all");
-const selectedCountry = ref(route.query.country || "all");
-const selectedDistance = ref(route.query.dist || "all");
+// Accessing filters directly from the store
+const { currentFilters } = storeToRefs(eventsStore);
 
-// Transform yearList to include human-readable text
+// Computed properties for transforming filter lists for select components
 const transformedYearList = computed(() => {
-  return props.yearList.map((year) => {
+  return currentFilters.value.yearList.map((year) => {
     switch (year) {
       case "futur":
         return { value: year, title: "Future Events" };
@@ -84,21 +88,40 @@ const transformedYearList = computed(() => {
   });
 });
 
-// Watch the route to update selectedYear when query parameters change
-watch(
-  () => route.query.year,
-  (newYear) => {
-    selectedYear.value = newYear || "all";
-  }
-);
+// Computed to reactively update selected filters based on route query or store state
+const selectedYear = computed({
+  get: () => route.query.year || currentFilters.value.year,
+  set: (val) => {
+    currentFilters.value.year = val;
+  },
+});
+const selectedCountry = computed({
+  get: () => route.query.country || currentFilters.value.country,
+  set: (val) => {
+    currentFilters.value.country = val;
+  },
+});
+const selectedDistance = computed({
+  get: () => route.query.dist || currentFilters.value.dist,
+  set: (val) => {
+    currentFilters.value.dist = val;
+  },
+});
 
+// Function to apply filters which now updates the Pinia store and optionally the route
 const applyFilters = () => {
+  eventsStore.fetchEvents({
+    year: currentFilters.value.year,
+    country: currentFilters.value.country,
+    dist: currentFilters.value.dist,
+  });
+  // Optionally update the route if you want to reflect the filter state in the URL
   router.replace({
     path: "/events",
     query: {
-      year: selectedYear.value || undefined,
-      country: selectedCountry.value || undefined,
-      dist: selectedDistance.value || undefined,
+      year: currentFilters.value.year || undefined,
+      country: currentFilters.value.country || undefined,
+      dist: currentFilters.value.dist || undefined,
     },
   });
 };
