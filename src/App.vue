@@ -1,24 +1,18 @@
-// App.vue
 <template>
-  <v-theme-provider :theme="theme">
-    <v-app :class="['app-container', theme]">
-      <NavigationBar />
-      <v-main>
-        <v-container>
-          <router-view />
-        </v-container>
-      </v-main>
-      <v-footer color="primary" app>
-        <span>&copy; 2024 DUV</span>
-      </v-footer>
-    </v-app>
-  </v-theme-provider>
+  <v-app :theme="themeStore.currentTheme" class="app-container">
+    <NavigationBar />
+    <v-main>
+      <v-container>
+        <router-view />
+      </v-container>
+    </v-main>
+    <v-footer color="primary" app>
+      <span>&copy; 2024 DUV</span>
+    </v-footer>
+  </v-app>
 </template>
 
 <script setup>
-import { ref, provide } from "vue";
-import NavigationBar from "./components/NavigationBar.vue";
-
-const theme = ref("dark");
-provide("theme", theme);
+import { useThemeStore } from "@/stores/ThemeStore";
+const themeStore = useThemeStore();
 </script>

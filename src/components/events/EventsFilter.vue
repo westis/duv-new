@@ -1,4 +1,4 @@
-// src/components/CalendarFilters.vue
+// src/components/events/EventsFilters.vue
 <template>
   <div class="filters pa-2">
     <v-row>
@@ -56,9 +56,6 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, watchEffect } from "vue";
-import { useRoute, useRouter } from "vue-router";
-
 const route = useRoute();
 const router = useRouter();
 

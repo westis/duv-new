@@ -1,132 +1,165 @@
 <template>
-  <v-app-bar app dense>
-    <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-
-    <v-toolbar-title @click="goHome" style="cursor: pointer">
-      <img :src="computedLogo" alt="DUV Logo" class="logo" />
-    </v-toolbar-title>
-
-    <SearchComponent class="hidden-md-and-up" />
+  <v-app-bar app density="compact">
+    <!-- Using the prepend slot for logo and search -->
+    <template #prepend>
+      <router-link
+        to="/"
+        class="d-flex align-center ms-4 me-2"
+        style="cursor: pointer"
+      >
+        <v-img
+          :src="computedLogo.src"
+          :width="computedLogo.width"
+          max-height="40"
+          alt="DUV Logo"
+          contain
+        ></v-img>
+      </router-link>
+      <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+      <SearchComponent />
+    </template>
 
     <v-spacer></v-spacer>
 
-    <SearchComponent class="hidden-sm-and-down" />
-
+    <!-- Navigation buttons remain in the default slot, pushed to the right -->
     <v-btn
-      text
-      class="nav-item mx-2 hidden-xs-and-down"
-      :class="{ 'v-btn--active': isSelectedUpcomingEvents }"
+      :size="buttonSize"
+      class="nav-item mx-0 px-3 text-body-2"
+      :class="{ 'v-btn--active': isActive('/events', { year: 'futur' }) }"
       @click="navigateTo('/events', { year: 'futur' })"
     >
-      Upcoming Events
+      {{ smAndUp ? "Upcoming Events" : "Upcoming" }}
     </v-btn>
-
     <v-btn
-      text
-      class="nav-item mx-2 hidden-xs-and-down"
-      :class="{ 'v-btn--active': isSelectedResults }"
+      :size="buttonSize"
+      class="nav-item mx-0 px-3 text-body-2"
+      :class="{ 'v-btn--active': isActive('/events', { year: 'past1' }) }"
       @click="navigateTo('/events', { year: 'past1' })"
     >
       Results
     </v-btn>
 
     <v-btn icon @click="toggleTheme">
-      <v-icon>{{ themeIcon }}</v-icon>
+      <v-icon>
+        {{
+          themeStore.currentTheme === "dark"
+            ? "mdi-white-balance-sunny"
+            : "mdi-weather-night"
+        }}
+      </v-icon>
     </v-btn>
   </v-app-bar>
-
-  <v-navigation-drawer v-model="drawer" app>
-    <v-list dense>
+  <v-navigation-drawer v-model="drawer">
+    <v-list>
       <v-list-item
         v-for="item in navItems"
         :key="item.title"
         link
-        :to="{ path: item.path }"
+        :to="{ path: item.path, query: item.query }"
+        :class="{
+          'v-list-item--active': isActiveNavItem(item.path, item.query),
+        }"
         :title="item.title"
         :prepend-icon="item.icon"
       >
+        <template v-slot:prepend>
+          <v-icon size="small">{{ item.icon }}</v-icon>
+        </template>
+        <template v-slot:title>
+          <v-list-item-title class="text-body-2">{{
+            item.title
+          }}</v-list-item-title>
+        </template>
       </v-list-item>
     </v-list>
   </v-navigation-drawer>
 </template>
 
-<script setup>
-import { inject, computed, ref, onMounted, onBeforeUnmount } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import SearchComponent from "./SearchComponent.vue";
-
-// Static imports for logos
+<script setup lang="ts">
+import { useThemeStore } from "@/stores/ThemeStore";
+import { useDisplay } from "vuetify";
 import logo from "@/assets/duv_logo_with_name.png";
 import logoWhite from "@/assets/duv_logo_with_name_white.png";
 import logoSymbol from "@/assets/duv_logo_symbol.png";
 import logoSymbolWhite from "@/assets/duv_logo_symbol_white.png";
 
+const themeStore = useThemeStore();
 const drawer = ref(false);
-const showTitle = ref(false);
 const route = useRoute();
 const router = useRouter();
-const theme = inject("theme"); // Assuming 'theme' is provided in a parent component
+const { smAndUp } = useDisplay();
 
-// Computed properties for dynamic logos and theme icon
 const computedLogo = computed(() => {
-  if (showTitle.value) {
-    return theme.value === "dark" ? logoSymbolWhite : logoSymbol;
+  // Determine if the theme is dark
+  const isDark = themeStore.currentTheme === "dark";
+
+  // Decide on the logo and width based on screen size and theme
+  if (smAndUp.value) {
+    return {
+      src: isDark ? logoWhite : logo,
+      width: "80", // Full logo width for larger screens
+    };
   } else {
-    return theme.value === "dark" ? logoWhite : logo;
+    return {
+      src: isDark ? logoSymbolWhite : logoSymbol,
+      width: "15", // Symbol logo width for smaller screens
+    };
   }
 });
 
-const themeIcon = computed(() =>
-  theme.value === "light" ? "mdi-weather-night" : "mdi-white-balance-sunny"
-);
-
-const navigateTo = (path, query) => {
-  // Retain all existing query parameters except those being explicitly changed
-  const newQuery = {
-    ...route.query,
-    ...query,
-  };
-
-  router.push({ path, query: newQuery });
-};
-
+const buttonSize = computed(() => (smAndUp.value ? "default" : "xx-small"));
 const currentYear = new Date().getFullYear();
 
-const isSelectedUpcomingEvents = computed(() => {
-  const yearQuery = route.query.year;
-  // Future events are selected by "futur" or a year greater than the current year
-  return (
-    yearQuery === "futur" || (yearQuery && parseInt(yearQuery) > currentYear)
-  );
-});
+const isActive = (path: string, query: Record<string, string> = {}) => {
+  // Check if the current route path matches the item path
+  const pathMatch = route.path === path;
 
-const isSelectedResults = computed(() => {
-  const yearQuery = route.query.year;
-  // Past events are selected by "past1" or a year less than the current year
-  return (
-    yearQuery === "past1" || (yearQuery && parseInt(yearQuery) < currentYear)
+  // Check if all specified query parameters match
+  const queryMatch = Object.keys(query).every(
+    (key) => route.query[key] === query[key]
   );
-});
 
-// Navigation Links
+  return pathMatch && queryMatch;
+};
+
+const isActiveNavItem = (path: string, query: Record<string, string> = {}) => {
+  const pathMatch = route.path === path;
+  const queryMatch =
+    Object.keys(query).length === 0 ||
+    Object.keys(query).every((key) => route.query[key] === query[key]);
+
+  return pathMatch && queryMatch;
+};
+
 const navItems = [
   { title: "Home", icon: "mdi-home", path: "/" },
-  { title: "Events", icon: "mdi-calendar", path: "/events/" },
+  {
+    title: "Events",
+    icon: "mdi-calendar",
+    path: "/events",
+    query: { year: "futur" },
+  },
+  {
+    title: "Results",
+    icon: "mdi-trophy",
+    path: "/events",
+    query: { year: "past1" },
+  },
   { title: "About", icon: "mdi-information", path: "/about" },
 ];
 
-// Handle window resizing for responsive logo display
-onMounted(() => {
-  const handleResize = () => (showTitle.value = window.innerWidth < 960);
-  handleResize();
-  window.addEventListener("resize", handleResize);
-  return () => window.removeEventListener("resize", handleResize);
-});
-
-// Navigation and Theme Switching Functions
 const goHome = () => router.push("/");
-const toggleTheme = () =>
-  (theme.value = theme.value === "light" ? "dark" : "light");
+const navigateTo = (path: string, query: Record<string, string>) => {
+  router.push({ path, query: { ...route.query, ...query } });
+};
+
+const toggleTheme = () => themeStore.toggleTheme();
+
+onMounted(() => {
+  const handleResize = () => (drawer.value = window.innerWidth < 960);
+  window.addEventListener("resize", handleResize);
+  onUnmounted(() => window.removeEventListener("resize", handleResize));
+});
 </script>
 
 <style scoped>
@@ -141,21 +174,8 @@ const toggleTheme = () =>
 
 /* Style for active navigation link */
 .active-link {
-  background-color: #1976d2; /* Example: a blue background */
+  background-color: #1976d2;
   color: white;
-  border-radius: 4px; /* Optional: adds rounded corners */
-}
-
-/* Hide elements based on screen size */
-.hidden-md-and-up {
-  @media (min-width: 960px) {
-    display: none;
-  }
-}
-
-.hidden-sm-and-down {
-  @media (max-width: 959px) {
-    display: none;
-  }
+  border-radius: 4px;
 }
 </style>

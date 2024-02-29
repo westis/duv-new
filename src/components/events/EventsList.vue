@@ -1,4 +1,4 @@
-// src/components/CalendarEvents.vue
+// src/components/events/EventsList.vue
 <template>
   <div v-if="isLoading">Loading...</div>
   <div v-else-if="events.length > 0">
@@ -136,9 +136,7 @@
 </template>
 
 <script setup>
-import { ref, computed, inject } from "vue";
-import { watchEffect } from "vue";
-
+import { useThemeStore } from "@/stores/ThemeStore";
 // Props
 const props = defineProps({
   events: { type: Array, required: true },
@@ -147,10 +145,10 @@ const props = defineProps({
 });
 
 // Access the provided theme state
-const theme = inject("theme"); // Ensure 'theme' is provided at the root or a parent component
+const themeStore = useThemeStore();
 
 watchEffect(() => {
-  console.log("Theme changed to:", theme.value);
+  console.log("Theme changed to:", themeStore.currentTheme);
 });
 
 // Reactive states
@@ -178,22 +176,38 @@ const typeNameMap = {
 
 // Color map adapted for light and dark mode
 const dynamicColorMap = computed(() => ({
-  1: theme.value === "dark" ? "grey-lighten-2" : "grey-darken-4", // Road event
-  2: theme.value === "dark" ? "green-lighten-2" : "green-darken-4", // Trail event
-  3: theme.value === "dark" ? "blue-grey-lighten-2" : "blue-grey-darken-4", // Road race on a loop
-  4: theme.value === "dark" ? "pink-lighten-2" : "pink-darken-4", // Stage race
-  5: theme.value === "dark" ? "deep-orange-lighten-2" : "deep-orange-darken-4", // Track
-  6: theme.value === "dark" ? "indigo-lighten-2" : "indigo-darken-4", // Indoor
-  7: theme.value === "dark" ? "deep-purple lighten-2" : "purple-darken-4", // Friendship run
-  8: theme.value === "dark" ? "indigo-lighten-2" : "deep-purple-darken-4", // Invitational race
-  9: theme.value === "dark" ? "red-lighten-2" : "red-darken-4", // Elimination race
-  10: theme.value === "dark" ? "brown-lighten-2" : "brown-darken-3", // Backyard Ultra
-  11: theme.value === "dark" ? "lime-lighten-2" : "yellow-darken-4", // Walking road
-  12: theme.value === "dark" ? "lime-lighten-2" : "yellow-darken-4", // Walking road (loop)
-  13: theme.value === "dark" ? "lime-lighten-2" : "yellow-darken-4", // Walking track
-  14: theme.value === "dark" ? "lime-lighten-2" : "yellow-darken-4", // Walking indoor
-  15: theme.value === "dark" ? "teal-lighten-2" : "teal-darken-4", // Duration
-  16: theme.value === "dark" ? "light-blue-lighten-2" : "light-blue-darken-4", // Length
+  1: themeStore.currentTheme === "dark" ? "grey-lighten-2" : "grey-darken-4", // Road event
+  2: themeStore.currentTheme === "dark" ? "green-lighten-2" : "green-darken-4", // Trail event
+  3:
+    themeStore.currentTheme === "dark"
+      ? "blue-grey-lighten-2"
+      : "blue-grey-darken-4", // Road race on a loop
+  4: themeStore.currentTheme === "dark" ? "pink-lighten-2" : "pink-darken-4", // Stage race
+  5:
+    themeStore.currentTheme === "dark"
+      ? "deep-orange-lighten-2"
+      : "deep-orange-darken-4", // Track
+  6:
+    themeStore.currentTheme === "dark" ? "indigo-lighten-2" : "indigo-darken-4", // Indoor
+  7:
+    themeStore.currentTheme === "dark"
+      ? "deep-purple lighten-2"
+      : "purple-darken-4", // Friendship run
+  8:
+    themeStore.currentTheme === "dark"
+      ? "indigo-lighten-2"
+      : "deep-purple-darken-4", // Invitational race
+  9: themeStore.currentTheme === "dark" ? "red-lighten-2" : "red-darken-4", // Elimination race
+  10: themeStore.currentTheme === "dark" ? "brown-lighten-2" : "brown-darken-3", // Backyard Ultra
+  11: themeStore.currentTheme === "dark" ? "lime-lighten-2" : "yellow-darken-4", // Walking road
+  12: themeStore.currentTheme === "dark" ? "lime-lighten-2" : "yellow-darken-4", // Walking road (loop)
+  13: themeStore.currentTheme === "dark" ? "lime-lighten-2" : "yellow-darken-4", // Walking track
+  14: themeStore.currentTheme === "dark" ? "lime-lighten-2" : "yellow-darken-4", // Walking indoor
+  15: themeStore.currentTheme === "dark" ? "teal-lighten-2" : "teal-darken-4", // Duration
+  16:
+    themeStore.currentTheme === "dark"
+      ? "light-blue-lighten-2"
+      : "light-blue-darken-4", // Length
 }));
 
 // Icon map remains the same
@@ -202,7 +216,7 @@ const iconMap = {
   2: "mdi-tree", // Trail Races
   3: "mdi-reload", // Road Race on a Loop
   4: "mdi-flag-checkered", // Stage Race
-  5: "mdi-run", // Track Events
+  5: "mdi-stadium-variant", // Track Events
   6: "mdi-home-variant", // Indoor Events
   7: "mdi-account-group", // Friendship Run
   8: "mdi-medal", // Invitational Race
@@ -252,7 +266,9 @@ const getEventProps = (event) => {
       break;
     case "R": // Cancelled
       props.cardClass =
-        theme.value === "dark" ? "race-cancelled-dark" : "race-cancelled-light";
+        themeStore.currentTheme === "dark"
+          ? "race-cancelled-dark"
+          : "race-cancelled-light";
       props.message = "This race has been cancelled.";
       props.buttonDisabled = true;
       props.buttonLabel = "Cancelled";
@@ -330,7 +346,7 @@ const getCardStyle = (resultsStatus) => {
   /* if (resultsStatus === "R") {
     return {
       borderColor:
-        theme.value === "dark"
+        themeStore.currentTheme === "dark"
           ? "rgb(var(--v-theme-error))"
           : "rgb(var(--v-theme-error))",
       borderWidth: "1px",

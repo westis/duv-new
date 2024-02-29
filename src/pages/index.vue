@@ -9,7 +9,7 @@
           <h1>Welcome to the DUV Ultramarathon Statistics</h1>
           <p>
             Your one-stop destination for ultramarathon events statistics,
-            calendar, results and athlete insights. Dive into our comprehensive
+            calendar, results, and athlete insights. Dive into our comprehensive
             database for detailed event information and historical performance
             data.
           </p>
@@ -20,22 +20,26 @@
 </template>
 
 <script setup>
-import { ref, computed, inject } from "vue";
+import { useThemeStore } from "@/stores/ThemeStore"; // Assuming themeStore is correctly set up for auto-imports
 
-const showTitle = ref(false);
-const theme = inject("theme");
-
-// Logo logic
+// Static imports for logos
 import logo from "@/assets/duv_logo_with_name.png";
 import logoWhite from "@/assets/duv_logo_with_name_white.png";
 import logoSymbol from "@/assets/duv_logo_symbol.png";
 import logoSymbolWhite from "@/assets/duv_logo_symbol_white.png";
 
+const themeStore = useThemeStore();
+
+// Since you're using Unplugin Auto Import, there's no need to explicitly import `ref` and `computed`
+const showTitle = ref(false);
+
+// Updated logo logic to use themeStore for theme checks
 const computedLogo = computed(() => {
+  // Determining which logo to use based on the current theme and whether the title is shown
   if (showTitle.value) {
-    return theme.value === "dark" ? logoSymbolWhite : logoSymbol;
+    return themeStore.currentTheme === "dark" ? logoSymbolWhite : logoSymbol;
   } else {
-    return theme.value === "dark" ? logoWhite : logo;
+    return themeStore.currentTheme === "dark" ? logoWhite : logo;
   }
 });
 </script>

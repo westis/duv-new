@@ -1,10 +1,9 @@
 // file path: src/main.ts
 
 import { createApp } from "vue";
+import { createPinia } from "pinia";
 import App from "./App.vue";
 import { createRouter, createWebHistory } from "vue-router/auto";
-import store from "./store";
-import NavigationBar from "./components/NavigationBar.vue"; // Import NavigationBar
 import "./assets/main.css";
 
 // Vuetify
@@ -24,7 +23,7 @@ const vuetify = createVuetify({
       light: {
         // Your light theme colors
         colors: {
-          primary: colors.red.darken1, // #E53935
+          primary: colors.red.darken4, // #E53935
           secondary: colors.red.lighten4, // #FFCDD2
         },
       },
@@ -46,7 +45,8 @@ const router = createRouter({
 });
 
 const app = createApp(App);
-app.use(store);
+const pinia = createPinia();
+app.use(pinia);
 app.use(router);
 app.use(vuetify);
 app.mount("#app");
