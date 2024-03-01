@@ -7,6 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    EventCard: typeof import('./components/events/EventCard.vue')['default']
     EventResults: typeof import('./components/EventResults.vue')['default']
     EventResultsFilters: typeof import('./components/EventResultsFilters.vue')['default']
     EventResultsHeader: typeof import('./components/EventResultsHeader.vue')['default']
@@ -18,8 +19,5 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SearchComponent: typeof import('./components/SearchComponent.vue')['default']
-    VListItemContent: typeof import('vuetify/lib')['VListItemContent']
-    VListItemIcon: typeof import('vuetify/lib')['VListItemIcon']
-    VSubheader: typeof import('vuetify/lib')['VSubheader']
   }
 }
