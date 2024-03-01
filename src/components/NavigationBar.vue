@@ -1,3 +1,4 @@
+// src/components/NavigationBar.vue
 <template>
   <v-app-bar app density="compact">
     <!-- Using the prepend slot for logo and search -->
@@ -148,9 +149,10 @@ const navItems = [
   { title: "About", icon: "mdi-information", path: "/about" },
 ];
 
-const goHome = () => router.push("/");
 const navigateTo = (path: string, query: Record<string, string>) => {
-  router.push({ path, query: { ...route.query, ...query } });
+  console.log("Current route query:", route.query);
+  console.log("Navigating to:", path, "with query:", query);
+  router.push({ path, query });
 };
 
 const toggleTheme = () => themeStore.toggleTheme();

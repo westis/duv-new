@@ -17,7 +17,7 @@ import axios from "axios";
 const baseUrl = `${import.meta.env.VITE_API_BASE_URL}/mcalendar.php`;
 
 export const defaultParams = {
-  year: "futur",
+  year: "",
   dist: "all",
   country: "all",
   cups: "all",

@@ -8,7 +8,7 @@ export const useEventsStore = defineStore("events", {
     isLoading: false,
     errorMessage: "",
     currentFilters: {
-      year: "futur",
+      year: "past1",
       country: "all",
       dist: "all",
       type: "all",
@@ -29,17 +29,25 @@ export const useEventsStore = defineStore("events", {
       this.isLoading = true;
       this.errorMessage = "";
       try {
-        const response = await fetchCalendarData({
-          year: this.currentFilters.year,
-          country: this.currentFilters.country,
-          dist: this.currentFilters.dist,
-          type: this.currentFilters.type,
-          ...params,
-        });
-        this.events = response.events;
-        Object.assign(this.currentFilters, response.filters);
+        // Merge params with currentFilters, ensuring params take precedence
+        const apiParams = {
+          ...this.currentFilters, // Defaults from current state
+          ...params, // Overrides from method arguments
+        };
 
-        // Update the pagination.totalEvents with the extracted total events count
+        const response = await fetchCalendarData(apiParams);
+        this.events = response.events;
+
+        // Optionally, update currentFilters with the new parameters used for fetching
+        // This step ensures that the store's currentFilters reflect the latest fetch operation
+        // It's particularly useful if other parts of your application rely on observing currentFilters
+        // to react to changes in the fetched data criteria
+        this.currentFilters = {
+          ...this.currentFilters,
+          ...params,
+        };
+
+        // Update pagination information based on the response
         this.pagination.totalEvents = response.totalEvents;
       } catch (error) {
         this.errorMessage = error.message || "Failed to load events.";
