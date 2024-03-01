@@ -17,6 +17,11 @@ export const useEventsStore = defineStore("events", {
       distanceList: [],
       eventTypeList: [],
     },
+    pagination: {
+      currentPage: 1,
+      pageSize: 100, // Assuming 100 events per page as per your API
+      totalEvents: 0,
+    },
   }),
 
   actions: {
@@ -33,6 +38,9 @@ export const useEventsStore = defineStore("events", {
         });
         this.events = response.events;
         Object.assign(this.currentFilters, response.filters);
+
+        // Update the pagination.totalEvents with the extracted total events count
+        this.pagination.totalEvents = response.totalEvents;
       } catch (error) {
         this.errorMessage = error.message || "Failed to load events.";
       } finally {

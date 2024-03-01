@@ -2,8 +2,10 @@
 <template>
   <div v-if="isLoading">Loading...</div>
   <div v-else-if="events.length > 0">
-    <v-container>
-      <v-row class="mt-2">
+    <!-- Display total number of events -->
+    <v-sheet>Total Events: {{ totalEvents }}</v-sheet>
+    <v-container class="pt-1">
+      <v-row class="mt-0">
         <v-col
           class="pa-0 mb-3"
           v-for="event in paginatedEvents"
@@ -129,9 +131,9 @@
   </div>
   <div v-else>No events found.</div>
   <v-pagination
-    v-model="currentPage"
-    :length="totalPages"
-    :total-visible="5"
+    v-model="pagination.currentPage"
+    :length="Math.ceil(pagination.totalEvents / pagination.pageSize)"
+    @update:modelValue="pageChanged"
   ></v-pagination>
 </template>
 
@@ -146,7 +148,14 @@ const themeStore = useThemeStore();
 const eventsStore = useEventsStore();
 
 // Access state and actions from the store
-const { events, isLoading } = storeToRefs(eventsStore);
+const { events, isLoading, pagination } = storeToRefs(eventsStore);
+
+// Computed property for totalEvents to be displayed
+const totalEvents = computed(() => pagination.value.totalEvents);
+
+const pageChanged = (newPage) => {
+  eventsStore.fetchEvents({ page: newPage });
+};
 
 const props = defineProps({
   events: Array,

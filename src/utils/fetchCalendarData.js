@@ -48,11 +48,19 @@ export async function fetchCalendarData(params = {}) {
   try {
     const response = await axios.get(`${baseUrl}?${queryString}`);
 
+    // Extract total events from the response
+    const totalEventsString = response.data.nlsText.nlsCalendarFoundEvents;
+    const totalEventsMatch = totalEventsString.match(/\d+/);
+    const totalEvents = totalEventsMatch
+      ? parseInt(totalEventsMatch[0], 10)
+      : 0;
+
     // Attempt to parse the JSON response
     try {
       return {
         events: response.data.Races,
         pagination: response.data.Pagination,
+        totalEvents,
         filters: {
           yearList: response.data.FltYearlist,
           countryList: response.data.FltCountryValues.map((code, index) => ({
