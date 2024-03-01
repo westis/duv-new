@@ -23,7 +23,7 @@ const vuetify = createVuetify({
       light: {
         // Your light theme colors
         colors: {
-          primary: colors.red.darken4, // #E53935
+          primary: "#FEA541", // #E53935
           secondary: colors.red.lighten4, // #FFCDD2
         },
       },

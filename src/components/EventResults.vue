@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { ref, inject } from "vue";
+import { useThemeStore } from "@/stores/ThemeStore";
 
 export default {
   props: {
@@ -37,7 +37,7 @@ export default {
   },
   setup(props) {
     // Inject the theme state, assuming the parent component provides it
-    const theme = inject("theme", ref("light")); // Default to 'light' if not provided
+    const themeStore = useThemeStore();
 
     const headers = ref([
       { title: "Rank", value: "RankTotal" },
@@ -75,12 +75,12 @@ export default {
       let props = {};
       if (Gender === "M") {
         props.class =
-          theme.value === "dark"
+          themeStore.currentTheme === "dark"
             ? "bg-blue-grey-darken-4"
             : "bg-light-blue-lighten-5";
       } else if (Gender === "F") {
         props.class =
-          theme.value === "dark"
+          themeStore.currentTheme === "dark"
             ? "bg-brown-darken-4 opacity-40"
             : "bg-red-lighten-5";
       } else {
@@ -98,21 +98,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.light-blue {
-  background-color: #add8e6; /* light blue */
-}
-
-.v-data-table__tr.dark-blue {
-  background-color: #0000cd; /* dark blue */
-}
-
-.v-data-table__tr.light-red {
-  background-color: #f08080; /* light red */
-}
-
-.v-data-table__tr.dark-red {
-  background-color: #8b0000; /* dark red */
-}
-</style>
