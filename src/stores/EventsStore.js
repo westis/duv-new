@@ -36,16 +36,20 @@ export const useEventsStore = defineStore("events", {
         };
 
         const response = await fetchCalendarData(apiParams);
+        console.log("API Response:", response); // Debug log
         this.events = response.events;
 
-        // Optionally, update currentFilters with the new parameters used for fetching
-        // This step ensures that the store's currentFilters reflect the latest fetch operation
-        // It's particularly useful if other parts of your application rely on observing currentFilters
-        // to react to changes in the fetched data criteria
-        this.currentFilters = {
-          ...this.currentFilters,
-          ...params,
-        };
+        // Update currentFilters with new parameters and preserve filter lists from the API response
+        this.currentFilters.year = params.year || this.currentFilters.year;
+        this.currentFilters.country =
+          params.country || this.currentFilters.country;
+        this.currentFilters.dist = params.dist || this.currentFilters.dist;
+
+        // Explicitly update the filter lists with those from the API response
+        this.currentFilters.yearList = response.filters.yearList;
+        this.currentFilters.countryList = response.filters.countryList;
+        this.currentFilters.distanceList = response.filters.distanceList;
+        this.currentFilters.eventTypeList = response.filters.eventTypeList; // Assuming this is also part of the response and needs updating
 
         // Update pagination information based on the response
         this.pagination.totalEvents = response.totalEvents;

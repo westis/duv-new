@@ -235,7 +235,7 @@ const getEventProps = (event) => {
       break;
     case "N": // No Results
       props.buttonDisabled = true;
-      props.buttonLabel = "No Results";
+      props.buttonLabel = "No results yet";
       props.buttonTo = false;
       props.buttonIcon = "mdi-close-box-outline";
       break;
