@@ -14,7 +14,6 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
 import { useDisplay } from "vuetify";
 
 // Destructure the properties you need from useDisplay

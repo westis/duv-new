@@ -27,12 +27,6 @@ import {
   defaultEventResultsParams,
 } from "@/utils/fetchEventResults";
 
-import EventResults from "@/components/EventResults";
-import EventResultsHeader from "@/components/EventResultsHeader";
-import EventResultsFilters from "@/components/EventResultsFilters";
-import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
-
 export default {
   components: { EventResults, EventResultsHeader, EventResultsFilters },
   setup() {

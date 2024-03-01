@@ -34,7 +34,6 @@
 </template>
 
 <script>
-import { ref } from "vue";
 import { defaultEventResultsParams } from "@/utils/fetchEventResults";
 
 export default {

@@ -8,6 +8,7 @@ import Components from "unplugin-vue-components/vite";
 import { VuetifyResolver } from "unplugin-vue-components/resolvers";
 import path from "path";
 import dotenv from "dotenv";
+import { visualizer } from "rollup-plugin-visualizer";
 
 // Load correct env file based on mode
 dotenv.config({ path: `.env.${process.env.MODE}` });
@@ -30,6 +31,12 @@ export default defineConfig({
         VuetifyResolver(), // Automatically import Vuetify components
       ],
       dts: "src/components.d.ts", // Generates a .d.ts file for auto-imported components
+    }),
+    visualizer({
+      open: true, // Automatically open the report in the browser
+      filename: "dist/stats.html", // Output file for the visualizer report
+      gzipSize: true, // Show gzip sizes
+      brotliSize: true, // Show brotli sizes
     }),
   ],
   base: process.env.VITE_BASE_URL,
