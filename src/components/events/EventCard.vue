@@ -89,7 +89,7 @@
           class="ma-2 bg-primary"
           size="small"
           text
-          :to="`/event/${event.EventID}`"
+          @click="navigateToEventDetails(event.EventID)"
         >
           <v-icon start>mdi-information-outline</v-icon>
           Event Details
@@ -101,11 +101,7 @@
           size="small"
           text
           :disabled="getEventProps(event).buttonDisabled"
-          :href="
-            getEventProps(event).buttonTo
-              ? `/events/${event.EventID}/results`
-              : undefined
-          "
+          @click="navigateToResults(event.EventID)"
         >
           <v-icon start>{{ getEventProps(event).buttonIcon }}</v-icon>
           {{ getEventProps(event).buttonLabel }}
@@ -124,6 +120,16 @@ const props = defineProps({
 });
 
 const themeStore = useThemeStore();
+
+const router = useRouter();
+
+const navigateToEventDetails = (eventId) => {
+  router.push(`/event/${eventId}`);
+};
+
+const navigateToResults = (eventId) => {
+  router.push(`/events/${eventId}/results`);
+};
 
 // Type name map
 const typeNameMap = {
